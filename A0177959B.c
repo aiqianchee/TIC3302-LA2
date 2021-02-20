@@ -15,20 +15,9 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
     if(!(ctx = EVP_CIPHER_CTX_new()))
         handleErrors();
 
-    /*
-     * Initialise the encryption operation. IMPORTANT - ensure you use a key
-     * and IV size appropriate for your cipher
-     * In this example we are using 256 bit AES (i.e. a 256 bit key). The
-     * IV size for *most* modes is the same as the block size. For AES this
-     * is 128 bits
-     */
     if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv))
         handleErrors();
 
-    /*
-     * Provide the message to be encrypted, and obtain the encrypted output.
-     * EVP_EncryptUpdate can be called multiple times if necessary
-     */
     if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
         handleErrors();
     ciphertext_len = len;
@@ -104,7 +93,7 @@ int main (int argc, char * argv[]){
     unsigned char *key;
 
     /* A 128 bit IV */
-    unsigned char *iv[16] = {
+    unsigned char iv[16] = {
         0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00,
@@ -128,10 +117,11 @@ int main (int argc, char * argv[]){
 
     int decryptedtext_len, ciphertext_len;
     char cipher_fromquestion[] = "8d20e5056a8d24d0462ce74e4904c1b513e10d1df4a2ef2ad4540fae1ca0aaf9";
-    if (argc != 2) {
-        printf("%s \n", argv[0]);
-        return -1;
-    }
+
+    // if (argc != 2) {
+    //     printf("argc is not 2, the argc[0] is: %s \n", argv[0]);
+    //     return -1;
+    // }
 
     f_word = fopen("words.txt", "r");
     if (!f_word){
@@ -140,7 +130,7 @@ int main (int argc, char * argv[]){
     }
 
     while (fscanf(f_word, "%s", word) != EOF) {
-        printf("%s\n", word);
+        printf("The key use is: %s\n", word);
         //padding
         int pad = 16 - strlen(word);
         if (strlen(word) < 16) {
@@ -162,8 +152,8 @@ int main (int argc, char * argv[]){
     BIO_dump_fp (stdout, (const char *)ciphertext, ciphertext_len);
     
     
-    if ( strcmp(cipher_fromquestion, ciphertext) ) {
-        printf("%s", key);
+    if ( strcmp(ciphertext, cipher_fromquestion)==0 ) {
+        printf("Found it! The key is: %s", key);
         break;
     }
     }
