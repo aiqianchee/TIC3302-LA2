@@ -129,7 +129,7 @@ int main (int argc, char * argv[]){
     unsigned char decryptedtext[128];
 
     int decryptedtext_len, ciphertext_len;
-    unsigned char cipher_fromquestion[128] = "8d20e5056a8d24d0462ce74e4904c1b513e10d1df4a2ef2ad4540fae1ca0aaf9";
+    unsigned char *cipher_fromquestion = "8d20e5056a8d24d0462ce74e4904c1b513e10d1df4a2ef2ad4540fae1ca0aaf9";
 
     f_word = fopen("words.txt", "r");
     if (!f_word){
@@ -138,7 +138,7 @@ int main (int argc, char * argv[]){
     }
 
     while (fscanf(f_word, "%s", word) != EOF) {
-        printf("\nThe key use is: %s\n", word);
+        //printf("\nThe key use is: %s\n", word);
         //padding
         int pad = 16 - strlen(word);
         if (strlen(word) < 16) {
@@ -155,18 +155,28 @@ int main (int argc, char * argv[]){
     ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key, iv,
                               ciphertext);
 
-    /* Do something useful with the ciphertext here */
-    printf("Ciphertext is:\n");
-    BIO_dump_fp (stdout, (const char *)ciphertext, ciphertext_len);
 
-    
-    if (strcmp(ciphertext, cipher_fromquestion)== 0) {
-        printf("\nFound it! The key is: %s", key);
+
+    unsigned char cryptohex[50]; 
+	for (int i = 0; i < ciphertext_len; i++) { 
+			sprintf(cryptohex+i*2,"%02x", ciphertext[i]); 
+		} 
+	
+	cryptohex[ciphertext_len*2] = '\0'; 
+    if (strcmp(cryptohex, cipher_fromquestion)== 0) {
+        printf("Found it! The key is: %s", key);
         break;
     }
+
     }
+    
+    /* Do something useful with the ciphertext here */
+    printf("\nCiphertext is:\n");
+    BIO_dump_fp (stdout, (const char *)ciphertext, ciphertext_len);
     
     fclose(f_word);
     return 0;
     
+}
+ 
 }
